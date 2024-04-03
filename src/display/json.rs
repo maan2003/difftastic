@@ -24,11 +24,11 @@ enum Status {
 }
 
 #[derive(Debug)]
-struct File<'f> {
-    language: &'f FileFormat,
-    path: &'f str,
-    chunks: Vec<Vec<Line<'f>>>,
-    status: Status,
+pub struct File<'f> {
+    pub language: &'f FileFormat,
+    pub path: &'f str,
+    pub chunks: Vec<Vec<Line<'f>>>,
+    pub status: Status,
 }
 
 impl<'f> File<'f> {
@@ -193,11 +193,11 @@ impl<'f> Serialize for File<'f> {
 }
 
 #[derive(Debug, Serialize)]
-struct Line<'l> {
+pub struct Line<'l> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    lhs: Option<Side<'l>>,
+    pub lhs: Option<Side<'l>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    rhs: Option<Side<'l>>,
+    pub rhs: Option<Side<'l>>,
 }
 
 impl<'l> Line<'l> {
@@ -210,9 +210,9 @@ impl<'l> Line<'l> {
 }
 
 #[derive(Debug, Serialize)]
-struct Side<'s> {
-    line_number: u32,
-    changes: Vec<Change<'s>>,
+pub struct Side<'s> {
+    pub line_number: u32,
+    pub changes: Vec<Change<'s>>,
 }
 
 impl<'s> Side<'s> {
@@ -225,18 +225,18 @@ impl<'s> Side<'s> {
 }
 
 #[derive(Debug, Serialize)]
-struct Change<'c> {
-    start: u32,
-    end: u32,
-    content: &'c str,
-    highlight: Highlight,
+pub struct Change<'c> {
+    pub start: u32,
+    pub end: u32,
+    pub content: &'c str,
+    pub highlight: Highlight,
 }
 
 #[derive(Debug, Serialize)]
 #[serde(rename_all = "snake_case")]
 // TODO: use syntax::TokenKind and syntax::AtomKind instead of this merged enum,
 // blocked by https://github.com/serde-rs/serde/issues/1402
-enum Highlight {
+pub enum Highlight {
     Delimiter,
     Normal,
     String,
@@ -273,7 +273,7 @@ impl Highlight {
     }
 }
 
-pub(crate) fn print_directory(diffs: Vec<DiffResult>, print_unchanged: bool) {
+pub fn print_directory(diffs: Vec<DiffResult>, print_unchanged: bool) {
     let files = diffs
         .iter()
         .map(File::from)
@@ -285,7 +285,7 @@ pub(crate) fn print_directory(diffs: Vec<DiffResult>, print_unchanged: bool) {
     );
 }
 
-pub(crate) fn print(diff: &DiffResult) {
+pub fn print(diff: &DiffResult) {
     let file = File::from(diff);
     println!(
         "{}",

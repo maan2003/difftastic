@@ -19,35 +19,35 @@ use crate::{
     version::VERSION,
 };
 
-pub(crate) const DEFAULT_BYTE_LIMIT: usize = 1_000_000;
+pub const DEFAULT_BYTE_LIMIT: usize = 1_000_000;
 // Chosen experimentally: this is sufficiently many for all the sample
 // files (the highest is slow_before/after.rs at 1.3M nodes), but
 // small enough to terminate in ~5 seconds like the test file in #306.
-pub(crate) const DEFAULT_GRAPH_LIMIT: usize = 3_000_000;
-pub(crate) const DEFAULT_PARSE_ERROR_LIMIT: usize = 0;
+pub const DEFAULT_GRAPH_LIMIT: usize = 3_000_000;
+pub const DEFAULT_PARSE_ERROR_LIMIT: usize = 0;
 
-pub(crate) const DEFAULT_TAB_WIDTH: usize = 4;
+pub const DEFAULT_TAB_WIDTH: usize = 4;
 
-pub(crate) const USAGE: &str = concat!(env!("CARGO_BIN_NAME"), " [OPTIONS] OLD-PATH NEW-PATH");
+pub const USAGE: &str = concat!(env!("CARGO_BIN_NAME"), " [OPTIONS] OLD-PATH NEW-PATH");
 
 #[derive(Debug, Clone, Copy)]
-pub(crate) enum ColorOutput {
+pub enum ColorOutput {
     Always,
     Auto,
     Never,
 }
 
 #[derive(Debug, Clone)]
-pub(crate) struct DisplayOptions {
-    pub(crate) background_color: BackgroundColor,
-    pub(crate) use_color: bool,
-    pub(crate) display_mode: DisplayMode,
-    pub(crate) print_unchanged: bool,
-    pub(crate) tab_width: usize,
-    pub(crate) display_width: usize,
-    pub(crate) num_context_lines: u32,
-    pub(crate) syntax_highlight: bool,
-    pub(crate) sort_paths: bool,
+pub struct DisplayOptions {
+    pub background_color: BackgroundColor,
+    pub use_color: bool,
+    pub display_mode: DisplayMode,
+    pub print_unchanged: bool,
+    pub tab_width: usize,
+    pub display_width: usize,
+    pub num_context_lines: u32,
+    pub syntax_highlight: bool,
+    pub sort_paths: bool,
 }
 
 impl Default for DisplayOptions {
@@ -67,13 +67,13 @@ impl Default for DisplayOptions {
 }
 
 #[derive(Debug, Clone)]
-pub(crate) struct DiffOptions {
-    pub(crate) graph_limit: usize,
-    pub(crate) byte_limit: usize,
-    pub(crate) parse_error_limit: usize,
-    pub(crate) check_only: bool,
-    pub(crate) ignore_comments: bool,
-    pub(crate) strip_cr: bool,
+pub struct DiffOptions {
+    pub graph_limit: usize,
+    pub byte_limit: usize,
+    pub parse_error_limit: usize,
+    pub check_only: bool,
+    pub ignore_comments: bool,
+    pub strip_cr: bool,
 }
 
 impl Default for DiffOptions {
@@ -303,7 +303,7 @@ When multiple overrides are specified, the first matching override wins."))
 }
 
 #[derive(Debug, Copy, Clone)]
-pub(crate) enum DisplayMode {
+pub enum DisplayMode {
     Inline,
     SideBySide,
     SideBySideShowBoth,
@@ -311,14 +311,14 @@ pub(crate) enum DisplayMode {
 }
 
 #[derive(Eq, PartialEq, Debug)]
-pub(crate) enum FileArgument {
+pub enum FileArgument {
     NamedPath(std::path::PathBuf),
     Stdin,
     DevNull,
 }
 
 impl FileArgument {
-    pub(crate) fn permissions(&self) -> Option<FilePermissions> {
+    pub fn permissions(&self) -> Option<FilePermissions> {
         match self {
             FileArgument::NamedPath(path) => {
                 // When used with `git difftool`, the first argument
@@ -344,7 +344,7 @@ impl FileArgument {
 /// how to display them, so internally this is just a human-friendly
 /// string.
 #[derive(Debug, Eq, PartialEq)]
-pub(crate) struct FilePermissions(String);
+pub struct FilePermissions(String);
 
 impl Display for FilePermissions {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
@@ -404,7 +404,7 @@ fn relative_to_current(path: &Path) -> PathBuf {
 impl FileArgument {
     /// Return a `FileArgument` representing this command line
     /// argument.
-    pub(crate) fn from_cli_argument(arg: &OsStr) -> Self {
+    pub fn from_cli_argument(arg: &OsStr) -> Self {
         if arg == "/dev/null" {
             FileArgument::DevNull
         } else if arg == "-" {
@@ -416,7 +416,7 @@ impl FileArgument {
 
     /// Return a `FileArgument` that always represents a path that
     /// exists, with the exception of `/dev/null`, which is turned into [FileArgument::DevNull].
-    pub(crate) fn from_path_argument(arg: &OsStr) -> Self {
+    pub fn from_path_argument(arg: &OsStr) -> Self {
         // For new and deleted files, Git passes `/dev/null` as the reference file.
         if arg == "/dev/null" {
             FileArgument::DevNull
@@ -438,7 +438,7 @@ impl Display for FileArgument {
     }
 }
 
-pub(crate) enum Mode {
+pub enum Mode {
     Diff {
         diff_options: DiffOptions,
         display_options: DisplayOptions,
@@ -596,7 +596,7 @@ fn parse_overrides_or_die(raw_overrides: &[String]) -> Vec<(LanguageOverride, Ve
 }
 
 /// Parse CLI arguments passed to the binary.
-pub(crate) fn parse_args() -> Mode {
+pub fn parse_args() -> Mode {
     let matches = app().get_matches();
 
     let color_output = match matches.value_of("color").expect("color has a default") {
@@ -865,7 +865,7 @@ fn detect_display_width() -> usize {
     80
 }
 
-pub(crate) fn should_use_color(color_output: ColorOutput) -> bool {
+pub fn should_use_color(color_output: ColorOutput) -> bool {
     match color_output {
         ColorOutput::Always => true,
         ColorOutput::Auto => {

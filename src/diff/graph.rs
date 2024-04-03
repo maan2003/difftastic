@@ -50,13 +50,13 @@ use crate::{
 ///      ^              ^
 /// ```
 #[derive(Debug, Clone)]
-pub(crate) struct Vertex<'s, 'b> {
-    pub(crate) neighbours: RefCell<Option<Vec<(Edge, &'b Vertex<'s, 'b>)>>>,
-    pub(crate) predecessor: Cell<Option<(u32, &'b Vertex<'s, 'b>)>>,
+pub struct Vertex<'s, 'b> {
+    pub neighbours: RefCell<Option<Vec<(Edge, &'b Vertex<'s, 'b>)>>>,
+    pub predecessor: Cell<Option<(u32, &'b Vertex<'s, 'b>)>>,
     // TODO: experiment with storing SyntaxId only, and have a HashMap
     // from SyntaxId to &Syntax.
-    pub(crate) lhs_syntax: Option<&'s Syntax<'s>>,
-    pub(crate) rhs_syntax: Option<&'s Syntax<'s>>,
+    pub lhs_syntax: Option<&'s Syntax<'s>>,
+    pub rhs_syntax: Option<&'s Syntax<'s>>,
     parents: Stack<EnteredDelimiter<'s>>,
     lhs_parent_id: Option<SyntaxId>,
     rhs_parent_id: Option<SyntaxId>,
@@ -249,11 +249,11 @@ fn push_rhs_delimiter<'s>(
 }
 
 impl<'s, 'b> Vertex<'s, 'b> {
-    pub(crate) fn is_end(&self) -> bool {
+    pub fn is_end(&self) -> bool {
         self.lhs_syntax.is_none() && self.rhs_syntax.is_none() && self.parents.is_empty()
     }
 
-    pub(crate) fn new(
+    pub fn new(
         lhs_syntax: Option<&'s Syntax<'s>>,
         rhs_syntax: Option<&'s Syntax<'s>>,
     ) -> Self {
@@ -278,7 +278,7 @@ impl<'s, 'b> Vertex<'s, 'b> {
 ///
 /// See [`set_neighbours`] for all the edges available for a given `Vertex`.
 #[derive(Debug, Copy, Clone, PartialEq, Eq, Hash)]
-pub(crate) enum Edge {
+pub enum Edge {
     UnchangedNode {
         depth_difference: u32,
         /// Is this node just punctuation? We penalise this case,
@@ -304,7 +304,7 @@ pub(crate) enum Edge {
 }
 
 impl Edge {
-    pub(crate) fn cost(self) -> u32 {
+    pub fn cost(self) -> u32 {
         match self {
             // Matching nodes is always best.
             UnchangedNode {
@@ -481,7 +481,7 @@ fn pop_all_parents<'s>(
 
 /// Compute the neighbours of `v` if we haven't previously done so,
 /// and write them to the .neighbours cell inside `v`.
-pub(crate) fn set_neighbours<'s, 'b>(
+pub fn set_neighbours<'s, 'b>(
     v: &Vertex<'s, 'b>,
     alloc: &'b Bump,
     seen: &mut DftHashMap<&Vertex<'s, 'b>, Vec<&'b Vertex<'s, 'b>>>,
@@ -776,7 +776,7 @@ pub(crate) fn set_neighbours<'s, 'b>(
     v.neighbours.replace(Some(neighbours));
 }
 
-pub(crate) fn populate_change_map<'s, 'b>(
+pub fn populate_change_map<'s, 'b>(
     route: &[(Edge, &'b Vertex<'s, 'b>)],
     change_map: &mut ChangeMap<'s>,
 ) {

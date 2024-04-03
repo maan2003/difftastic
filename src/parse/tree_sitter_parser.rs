@@ -19,7 +19,7 @@ use crate::parse::syntax::{AtomKind, Syntax};
 /// languages we should parse them as.
 ///
 /// Note that we don't support sub-languages more than one layer deep.
-pub(crate) struct TreeSitterSubLanguage {
+pub struct TreeSitterSubLanguage {
     /// How to identify a node. The query must contain exactly one
     /// capture group (the name is arbitrary).
     query: ts::Query,
@@ -29,9 +29,9 @@ pub(crate) struct TreeSitterSubLanguage {
 }
 
 /// Configuration for a tree-sitter parser.
-pub(crate) struct TreeSitterConfig {
+pub struct TreeSitterConfig {
     /// The tree-sitter language parser.
-    pub(crate) language: ts::Language,
+    pub language: ts::Language,
 
     /// Tree-sitter nodes that we treat as indivisible atoms.
     ///
@@ -132,7 +132,7 @@ const OCAML_ATOM_NODES: [&str; 6] = [
     "attribute_id",
 ];
 
-pub(crate) fn from_language(language: guess::Language) -> TreeSitterConfig {
+pub fn from_language(language: guess::Language) -> TreeSitterConfig {
     use guess::Language::*;
     match language {
         Ada => {
@@ -934,18 +934,19 @@ pub(crate) fn from_language(language: guess::Language) -> TreeSitterConfig {
             }
         }
         Rust => {
-            let language = unsafe { tree_sitter_rust() };
-            TreeSitterConfig {
-                language,
-                atom_nodes: vec!["char_literal", "string_literal"].into_iter().collect(),
-                delimiter_tokens: vec![("{", "}"), ("(", ")"), ("[", "]"), ("|", "|"), ("<", ">")],
-                highlight_query: ts::Query::new(
-                    language,
-                    include_str!("../../vendored_parsers/highlights/rust.scm"),
-                )
-                .unwrap(),
-                sub_languages: vec![],
-            }
+            unimplemented!();
+            // let language = unsafe { tree_sitter_rust() };
+            // TreeSitterConfig {
+            //     language,
+            //     atom_nodes: vec!["char_literal", "string_literal"].into_iter().collect(),
+            //     delimiter_tokens: vec![("{", "}"), ("(", ")"), ("[", "]"), ("|", "|"), ("<", ">")],
+            //     highlight_query: ts::Query::new(
+            //         language,
+            //         include_str!("../../vendored_parsers/highlights/rust.scm"),
+            //     )
+            //     .unwrap(),
+            //     sub_languages: vec![],
+            // }
         }
         Scala => {
             let language = unsafe { tree_sitter_scala() };
@@ -1175,8 +1176,26 @@ pub(crate) fn from_language(language: guess::Language) -> TreeSitterConfig {
     }
 }
 
+pub fn from_language_raw(language: guess::Language, ts: ts::Language) -> TreeSitterConfig {
+    use guess::Language::*;
+    match language {
+        Rust => TreeSitterConfig {
+            language: ts,
+            atom_nodes: vec!["char_literal", "string_literal"].into_iter().collect(),
+            delimiter_tokens: vec![("{", "}"), ("(", ")"), ("[", "]"), ("|", "|"), ("<", ">")],
+            highlight_query: ts::Query::new(
+                ts,
+                include_str!("../../vendored_parsers/highlights/rust.scm"),
+            )
+            .unwrap(),
+            sub_languages: vec![],
+        },
+        _ => unimplemented!(),
+    }
+}
+
 /// Parse `src` with tree-sitter.
-pub(crate) fn to_tree(src: &str, config: &TreeSitterConfig) -> tree_sitter::Tree {
+pub fn to_tree(src: &str, config: &TreeSitterConfig) -> tree_sitter::Tree {
     let mut parser = ts::Parser::new();
     parser
         .set_language(config.language)
@@ -1186,9 +1205,9 @@ pub(crate) fn to_tree(src: &str, config: &TreeSitterConfig) -> tree_sitter::Tree
 }
 
 #[derive(Debug)]
-pub(crate) struct ExceededByteLimit(pub(crate) usize);
+pub struct ExceededByteLimit(pub usize);
 
-pub(crate) fn to_tree_with_limit(
+pub fn to_tree_with_limit(
     diff_options: &DiffOptions,
     config: &TreeSitterConfig,
     lhs_src: &str,
@@ -1205,7 +1224,7 @@ pub(crate) fn to_tree_with_limit(
 /// Find any nodes that can be parsed as other languages (e.g. JavaScript embedded in HTML),
 /// and return a map of their node IDs mapped to parsed trees. Every time we see such a node,
 /// we will ignore it and recurse into the root node of the given tree instead.
-pub(crate) fn parse_subtrees(
+pub fn parse_subtrees(
     src: &str,
     config: &TreeSitterConfig,
     tree: &tree_sitter::Tree,
@@ -1259,6 +1278,7 @@ fn tree_highlights(
     // of all the relevant highlighting queries.
     let cn = config.highlight_query.capture_names();
     for (idx, name) in cn.iter().enumerate() {
+        let name = *name;
         if name == "type"
             || name.starts_with("type.")
             || name.starts_with("storage.type.")
@@ -1331,7 +1351,7 @@ fn tree_highlights(
     }
 }
 
-pub(crate) fn print_tree(src: &str, tree: &tree_sitter::Tree) {
+pub fn print_tree(src: &str, tree: &tree_sitter::Tree) {
     let mut cursor = tree.walk();
     print_cursor(src, &mut cursor, 0);
 }
@@ -1366,7 +1386,7 @@ fn print_cursor(src: &str, cursor: &mut ts::TreeCursor, depth: usize) {
     }
 }
 
-pub(crate) fn comment_positions(
+pub fn comment_positions(
     tree: &tree_sitter::Tree,
     src: &str,
     config: &TreeSitterConfig,
@@ -1389,9 +1409,9 @@ pub(crate) fn comment_positions(
 }
 
 #[derive(Debug)]
-pub(crate) struct ExceededParseErrorLimit(pub(crate) usize);
+pub struct ExceededParseErrorLimit(pub usize);
 
-pub(crate) fn to_syntax_with_limit<'a>(
+pub fn to_syntax_with_limit<'a>(
     lhs_src: &str,
     rhs_src: &str,
     lhs_tree: &tree_sitter::Tree,
@@ -1424,7 +1444,7 @@ pub(crate) fn to_syntax_with_limit<'a>(
     Ok((lhs_nodes, rhs_nodes))
 }
 
-pub(crate) fn to_syntax<'a>(
+pub fn to_syntax<'a>(
     tree: &tree_sitter::Tree,
     src: &str,
     arena: &'a Arena<Syntax<'a>>,
@@ -1471,7 +1491,7 @@ pub(crate) fn to_syntax<'a>(
 }
 
 /// Parse `src` with tree-sitter and convert to difftastic Syntax.
-pub(crate) fn parse<'a>(
+pub fn parse<'a>(
     arena: &'a Arena<Syntax<'a>>,
     src: &str,
     config: &TreeSitterConfig,
@@ -1530,7 +1550,7 @@ fn find_delim_positions(
     None
 }
 
-pub(crate) struct HighlightedNodeIds {
+pub struct HighlightedNodeIds {
     keyword_ids: HashSet<usize>,
     comment_ids: HashSet<usize>,
     string_ids: HashSet<usize>,

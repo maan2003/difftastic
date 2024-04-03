@@ -37,7 +37,7 @@ use crate::{
     parse::syntax::Syntax::{self, *},
 };
 
-pub(crate) fn fix_all_sliders<'a>(
+pub fn fix_all_sliders<'a>(
     language: guess_language::Language,
     nodes: &[&'a Syntax<'a>],
     change_map: &mut ChangeMap<'a>,

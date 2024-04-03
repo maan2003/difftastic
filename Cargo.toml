@@ -38,7 +38,7 @@ pkg-fmt = "zip"
 
 [dependencies]
 # regex 1.10 requires rust 1.65.
-regex = ">= 1.9, < 1.10"
+regex = "1"
 
 clap = { version = "3.2.25", features = ["cargo", "env", "wrap_help"] }
 itertools = "0.11.0"
@@ -48,7 +48,8 @@ strsim = "0.10.0"
 lazy_static = "1.4.0"
 # tree-sitter 0.20.10 requires rust 1.65, although it could be lower.
 # https://github.com/tree-sitter/tree-sitter/issues/2669
-tree-sitter = "0.20.10"
+tree-sitter = { version = "0.22" }
+
 libc = "0.2.108"
 log = "0.4.14"
 pretty_env_logger = "0.5.0"
@@ -67,7 +68,7 @@ rayon = "1.7.0"
 
 tree_magic_mini = "3.1.4"
 # home (used by tree_magic_mini) 0.5.9 has an MSRV of 1.70.
-home = ">= 0.5, < 0.5.9"
+home = "0.5"
 
 # bumpalo 3.15 requires rust 1.65
 bumpalo = ">= 3.11, < 3.15"

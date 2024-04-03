@@ -45,10 +45,10 @@ impl<'a> fmt::Debug for ChangeKind<'a> {
     }
 }
 
-pub(crate) type SyntaxId = NonZeroU32;
+pub type SyntaxId = NonZeroU32;
 
 /// Fields that are common to both `Syntax::List` and `Syntax::Atom`.
-pub(crate) struct SyntaxInfo<'a> {
+pub struct SyntaxInfo<'a> {
     /// The previous node with the same parent as this one.
     previous_sibling: Cell<Option<&'a Syntax<'a>>>,
     /// The next node with the same parent as this one.
@@ -60,7 +60,7 @@ pub(crate) struct SyntaxInfo<'a> {
     parent: Cell<Option<&'a Syntax<'a>>>,
     /// The number of nodes that are ancestors of this one.
     num_ancestors: Cell<u32>,
-    pub(crate) num_after: Cell<usize>,
+    pub num_after: Cell<usize>,
     /// A number that uniquely identifies this syntax node.
     unique_id: Cell<SyntaxId>,
     /// A number that uniquely identifies the content of this syntax
@@ -75,7 +75,7 @@ pub(crate) struct SyntaxInfo<'a> {
 }
 
 impl<'a> SyntaxInfo<'a> {
-    pub(crate) fn new() -> Self {
+    pub fn new() -> Self {
         Self {
             previous_sibling: Cell::new(None),
             next_sibling: Cell::new(None),
@@ -96,7 +96,7 @@ impl<'a> Default for SyntaxInfo<'a> {
     }
 }
 
-pub(crate) enum Syntax<'a> {
+pub enum Syntax<'a> {
     List {
         info: SyntaxInfo<'a>,
         open_position: Vec<SingleLineSpan>,
@@ -192,7 +192,7 @@ impl<'a> fmt::Debug for Syntax<'a> {
 }
 
 impl<'a> Syntax<'a> {
-    pub(crate) fn new_list(
+    pub fn new_list(
         arena: &'a Arena<Syntax<'a>>,
         open_content: &str,
         open_position: Vec<SingleLineSpan>,
@@ -245,7 +245,7 @@ impl<'a> Syntax<'a> {
         })
     }
 
-    pub(crate) fn new_atom(
+    pub fn new_atom(
         arena: &'a Arena<Syntax<'a>>,
         mut position: Vec<SingleLineSpan>,
         mut content: &str,
@@ -270,42 +270,42 @@ impl<'a> Syntax<'a> {
         })
     }
 
-    pub(crate) fn info(&self) -> &SyntaxInfo<'a> {
+    pub fn info(&self) -> &SyntaxInfo<'a> {
         match self {
             List { info, .. } | Atom { info, .. } => info,
         }
     }
 
-    pub(crate) fn parent(&self) -> Option<&'a Syntax<'a>> {
+    pub fn parent(&self) -> Option<&'a Syntax<'a>> {
         self.info().parent.get()
     }
 
-    pub(crate) fn next_sibling(&self) -> Option<&'a Syntax<'a>> {
+    pub fn next_sibling(&self) -> Option<&'a Syntax<'a>> {
         self.info().next_sibling.get()
     }
 
     /// A unique ID of this syntax node. Every node is guaranteed to
     /// have a different value.
-    pub(crate) fn id(&self) -> SyntaxId {
+    pub fn id(&self) -> SyntaxId {
         self.info().unique_id.get()
     }
 
     /// A content ID of this syntax node. Two nodes have the same
     /// content ID if they have the same content, regardless of
     /// position.
-    pub(crate) fn content_id(&self) -> u32 {
+    pub fn content_id(&self) -> u32 {
         self.info().content_id.get()
     }
 
-    pub(crate) fn content_is_unique(&self) -> bool {
+    pub fn content_is_unique(&self) -> bool {
         self.info().content_is_unique.get()
     }
 
-    pub(crate) fn num_ancestors(&self) -> u32 {
+    pub fn num_ancestors(&self) -> u32 {
         self.info().num_ancestors.get()
     }
 
-    pub(crate) fn dbg_content(&self) -> String {
+    pub fn dbg_content(&self) -> String {
         match self {
             List {
                 open_content,
@@ -333,7 +333,7 @@ impl<'a> Syntax<'a> {
     }
 }
 
-pub(crate) fn comment_positions<'a>(nodes: &[&'a Syntax<'a>]) -> Vec<SingleLineSpan> {
+pub fn comment_positions<'a>(nodes: &[&'a Syntax<'a>]) -> Vec<SingleLineSpan> {
     fn walk_comment_positions(node: &Syntax<'_>, positions: &mut Vec<SingleLineSpan>) {
         match node {
             List { children, .. } => {
@@ -358,7 +358,7 @@ pub(crate) fn comment_positions<'a>(nodes: &[&'a Syntax<'a>]) -> Vec<SingleLineS
 }
 
 /// Initialise all the fields in `SyntaxInfo`.
-pub(crate) fn init_all_info<'a>(lhs_roots: &[&'a Syntax<'a>], rhs_roots: &[&'a Syntax<'a>]) {
+pub fn init_all_info<'a>(lhs_roots: &[&'a Syntax<'a>], rhs_roots: &[&'a Syntax<'a>]) {
     init_info(lhs_roots, rhs_roots);
     init_next_prev(lhs_roots);
     init_next_prev(rhs_roots);
@@ -440,7 +440,7 @@ fn set_num_after(nodes: &[&Syntax], parent_num_after: usize) {
         }
     }
 }
-pub(crate) fn init_next_prev<'a>(roots: &[&'a Syntax<'a>]) {
+pub fn init_next_prev<'a>(roots: &[&'a Syntax<'a>]) {
     set_prev_sibling(roots);
     set_next_sibling(roots);
     set_prev(roots, None);
@@ -563,7 +563,7 @@ impl<'a> Eq for Syntax<'a> {}
 /// Different types of strings. We want to diff these the same way,
 /// but highlight them differently.
 #[derive(PartialEq, Eq, Debug, Clone, Copy, Hash)]
-pub(crate) enum StringKind {
+pub enum StringKind {
     /// A string literal, such as `"foo"`.
     StringLiteral,
     /// Plain text, such as the content of `<p>foo</p>`.
@@ -571,7 +571,7 @@ pub(crate) enum StringKind {
 }
 
 #[derive(PartialEq, Eq, Debug, Clone, Copy, Hash)]
-pub(crate) enum AtomKind {
+pub enum AtomKind {
     Normal,
     // TODO: We should either have a AtomWithWords(HighlightKind) or a
     // separate String, Text and Comment kind.
@@ -584,14 +584,14 @@ pub(crate) enum AtomKind {
 
 /// Unlike atoms, tokens can be delimiters like `{`.
 #[derive(PartialEq, Eq, Debug, Clone, Copy)]
-pub(crate) enum TokenKind {
+pub enum TokenKind {
     Delimiter,
     Atom(AtomKind),
 }
 
 /// A matched token (an atom, a delimiter, or a comment word).
 #[derive(PartialEq, Eq, Debug, Clone)]
-pub(crate) enum MatchKind {
+pub enum MatchKind {
     UnchangedToken {
         highlight: TokenKind,
         self_pos: Vec<SingleLineSpan>,
@@ -615,7 +615,7 @@ pub(crate) enum MatchKind {
 }
 
 impl MatchKind {
-    pub(crate) fn is_novel(&self) -> bool {
+    pub fn is_novel(&self) -> bool {
         matches!(
             self,
             MatchKind::Novel { .. } | MatchKind::NovelWord { .. } | MatchKind::NovelLinePart { .. }
@@ -624,9 +624,9 @@ impl MatchKind {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub(crate) struct MatchedPos {
-    pub(crate) kind: MatchKind,
-    pub(crate) pos: SingleLineSpan,
+pub struct MatchedPos {
+    pub kind: MatchKind,
+    pub pos: SingleLineSpan,
 }
 
 /// Given the text `content` from a comment or strings, split it into
@@ -871,7 +871,7 @@ impl MatchedPos {
 }
 
 /// Walk `nodes` and return a vec of all the changed positions.
-pub(crate) fn change_positions<'a>(
+pub fn change_positions<'a>(
     nodes: &[&'a Syntax<'a>],
     change_map: &ChangeMap<'a>,
 ) -> Vec<MatchedPos> {
@@ -925,7 +925,7 @@ fn change_positions_<'a>(
     }
 }
 
-pub(crate) fn zip_pad_shorter<Tx: Clone, Ty: Clone>(
+pub fn zip_pad_shorter<Tx: Clone, Ty: Clone>(
     lhs: &[Tx],
     rhs: &[Ty],
 ) -> Vec<(Option<Tx>, Option<Ty>)> {
@@ -945,7 +945,7 @@ pub(crate) fn zip_pad_shorter<Tx: Clone, Ty: Clone>(
 
 /// Zip `lhs` with `rhs`, but repeat the last item from the shorter
 /// slice.
-pub(crate) fn zip_repeat_shorter<Tx: Clone, Ty: Clone>(lhs: &[Tx], rhs: &[Ty]) -> Vec<(Tx, Ty)> {
+pub fn zip_repeat_shorter<Tx: Clone, Ty: Clone>(lhs: &[Tx], rhs: &[Ty]) -> Vec<(Tx, Ty)> {
     let lhs_last: Tx = match lhs.last() {
         Some(last) => last.clone(),
         None => return vec![],

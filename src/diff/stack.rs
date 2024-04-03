@@ -11,26 +11,26 @@ struct Node<T> {
 /// This is similar to `Stack` from the rpds crate, but it's faster
 /// and uses less memory.
 #[derive(Debug, Clone, Default, PartialEq, Eq)]
-pub(crate) struct Stack<T> {
+pub struct Stack<T> {
     head: Option<Rc<Node<T>>>,
 }
 
 impl<T> Stack<T> {
-    pub(crate) fn new() -> Self {
+    pub fn new() -> Self {
         Self { head: None }
     }
 
-    pub(crate) fn peek(&self) -> Option<&T> {
+    pub fn peek(&self) -> Option<&T> {
         self.head.as_deref().map(|n| &n.val)
     }
 
-    pub(crate) fn pop(&self) -> Option<Stack<T>> {
+    pub fn pop(&self) -> Option<Stack<T>> {
         self.head.as_deref().map(|n| Self {
             head: n.next.clone(),
         })
     }
 
-    pub(crate) fn push(&self, v: T) -> Stack<T> {
+    pub fn push(&self, v: T) -> Stack<T> {
         Self {
             head: Some(Rc::new(Node {
                 val: v,
@@ -40,7 +40,7 @@ impl<T> Stack<T> {
     }
 
     // O(n)
-    pub(crate) fn size(&self) -> usize {
+    pub fn size(&self) -> usize {
         let mut count = 0;
         let mut node = &self.head;
         while let Some(next) = node {
@@ -50,7 +50,7 @@ impl<T> Stack<T> {
         count
     }
 
-    pub(crate) fn is_empty(&self) -> bool {
+    pub fn is_empty(&self) -> bool {
         self.head.is_none()
     }
 }

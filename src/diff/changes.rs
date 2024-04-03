@@ -6,7 +6,7 @@ use crate::{
 };
 
 #[derive(PartialEq, Eq, Clone, Copy)]
-pub(crate) enum ChangeKind<'a> {
+pub enum ChangeKind<'a> {
     Unchanged(&'a Syntax<'a>),
     ReplacedComment(&'a Syntax<'a>, &'a Syntax<'a>),
     ReplacedString(&'a Syntax<'a>, &'a Syntax<'a>),
@@ -14,21 +14,21 @@ pub(crate) enum ChangeKind<'a> {
 }
 
 #[derive(Debug, Default)]
-pub(crate) struct ChangeMap<'a> {
+pub struct ChangeMap<'a> {
     changes: DftHashMap<SyntaxId, ChangeKind<'a>>,
 }
 
 impl<'a> ChangeMap<'a> {
-    pub(crate) fn insert(&mut self, node: &'a Syntax<'a>, ck: ChangeKind<'a>) {
+    pub fn insert(&mut self, node: &'a Syntax<'a>, ck: ChangeKind<'a>) {
         self.changes.insert(node.id(), ck);
     }
 
-    pub(crate) fn get(&self, node: &Syntax<'a>) -> Option<ChangeKind<'a>> {
+    pub fn get(&self, node: &Syntax<'a>) -> Option<ChangeKind<'a>> {
         self.changes.get(&node.id()).copied()
     }
 }
 
-pub(crate) fn insert_deep_unchanged<'a>(
+pub fn insert_deep_unchanged<'a>(
     node: &'a Syntax<'a>,
     opposite_node: &'a Syntax<'a>,
     change_map: &mut ChangeMap<'a>,
@@ -55,7 +55,7 @@ pub(crate) fn insert_deep_unchanged<'a>(
     }
 }
 
-pub(crate) fn insert_deep_novel<'a>(node: &'a Syntax<'a>, change_map: &mut ChangeMap<'a>) {
+pub fn insert_deep_novel<'a>(node: &'a Syntax<'a>, change_map: &mut ChangeMap<'a>) {
     change_map.insert(node, ChangeKind::Novel);
 
     if let Syntax::List { children, .. } = node {

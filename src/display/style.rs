@@ -18,13 +18,13 @@ use crate::{
 };
 
 #[derive(Clone, Copy, Debug)]
-pub(crate) enum BackgroundColor {
+pub enum BackgroundColor {
     Dark,
     Light,
 }
 
 impl BackgroundColor {
-    pub(crate) fn is_dark(self) -> bool {
+    pub fn is_dark(self) -> bool {
         matches!(self, BackgroundColor::Dark)
     }
 }
@@ -115,7 +115,7 @@ fn split_string_by_width(s: &str, max_width: usize, tab_width: usize) -> Vec<(&s
 
 /// Return a copy of `src` with all the tab characters replaced by
 /// `tab_width` strings.
-pub(crate) fn replace_tabs(src: &str, tab_width: usize) -> String {
+pub fn replace_tabs(src: &str, tab_width: usize) -> String {
     let tab_as_spaces = " ".repeat(tab_width);
     src.replace('\t', &tab_as_spaces)
 }
@@ -123,7 +123,7 @@ pub(crate) fn replace_tabs(src: &str, tab_width: usize) -> String {
 /// Split `line` (from the source code) into multiple lines of
 /// `max_len` (i.e. word wrapping), and apply `styles` to each part
 /// according to its original position in `line`.
-pub(crate) fn split_and_apply(
+pub fn split_and_apply(
     line: &str,
     max_len: usize,
     tab_width: usize,
@@ -297,7 +297,7 @@ fn style_lines(lines: &[&str], styles: &[(SingleLineSpan, Style)]) -> Vec<String
     styled_lines
 }
 
-pub(crate) fn novel_style(style: Style, side: Side, background: BackgroundColor) -> Style {
+pub fn novel_style(style: Style, side: Side, background: BackgroundColor) -> Style {
     if background.is_dark() {
         match side {
             Side::Left => style.bright_red(),
@@ -311,7 +311,7 @@ pub(crate) fn novel_style(style: Style, side: Side, background: BackgroundColor)
     }
 }
 
-pub(crate) fn color_positions(
+pub fn color_positions(
     side: Side,
     background: BackgroundColor,
     syntax_highlight: bool,
@@ -392,7 +392,7 @@ pub(crate) fn color_positions(
     styles
 }
 
-pub(crate) fn apply_colors(
+pub fn apply_colors(
     s: &str,
     side: Side,
     syntax_highlight: bool,
@@ -427,7 +427,7 @@ fn apply_header_color(
 }
 
 /// Style `s` as a warning and write to stderr.
-pub(crate) fn print_warning(s: &str, display_options: &DisplayOptions) {
+pub fn print_warning(s: &str, display_options: &DisplayOptions) {
     let prefix = if display_options.use_color {
         if display_options.background_color.is_dark() {
             "warning: ".bright_yellow().to_string()
@@ -444,7 +444,7 @@ pub(crate) fn print_warning(s: &str, display_options: &DisplayOptions) {
     eprint!("{}\n\n", s);
 }
 
-pub(crate) fn apply_line_number_color(
+pub fn apply_line_number_color(
     s: &str,
     is_novel: bool,
     side: Side,
@@ -472,7 +472,7 @@ pub(crate) fn apply_line_number_color(
     }
 }
 
-pub(crate) fn header(
+pub fn header(
     display_path: &str,
     extra_info: Option<&String>,
     hunk_num: usize,

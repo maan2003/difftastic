@@ -1,7 +1,7 @@
-pub(crate) mod changes;
-pub(crate) mod dijkstra;
+pub mod changes;
+pub mod dijkstra;
 mod graph;
-pub(crate) mod myers_diff;
-pub(crate) mod sliders;
+pub mod myers_diff;
+pub mod sliders;
 mod stack;
-pub(crate) mod unchanged;
+pub mod unchanged;

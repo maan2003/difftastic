@@ -1769,7 +1769,7 @@ Visibility modifiers
 pub fn a() {}
 pub(super) fn b() {}
 pub(self) fn c() {}
-pub(crate) fn c() {}
+pub fn c() {}
 pub(in crate::d) fn e() {}
 
 --------------------------------------------------------------------------------
